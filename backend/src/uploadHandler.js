@@ -12,11 +12,9 @@ const STORAGE_SERVICE = process.env.STORAGE_SERVICE || "local";
 class UploadHandler {
   #io;
   #socketId;
-  storageService;
-  constructor(io, socketId, storageService) {
+  constructor(io, socketId) {
     this.#io = io;
     this.#socketId = socketId;
-    this.storageService = storageService;
   }
 
   registerEvents(headers, onFinish) {
