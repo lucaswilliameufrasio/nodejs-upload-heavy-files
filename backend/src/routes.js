@@ -18,7 +18,6 @@ class Routes {
   }
 
   async post(request, response) {
-    this.#io.sockets.setMaxListeners(0);
     const { headers } = request;
     const {
       query: { socketId },
