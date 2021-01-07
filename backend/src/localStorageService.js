@@ -12,6 +12,6 @@ module.exports = class LocalStorageService {
       `${v4()}-${fileName}`
     );
     logger.info("Uploading: " + saveFileTo);
-    createWriteStream(saveFileTo);
+    return createWriteStream(saveFileTo);
   }
 };
