@@ -22,7 +22,7 @@ const io = socketIo(server, {
   },
 });
 
-io.on("connection", (socket) => logger.info("someone connected" + socket.id));
+io.on("connection", (socket) => logger.info("someone connected " + socket.id));
 
 const startServer = () => {
   const { address, port } = server.address();
