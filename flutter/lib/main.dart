@@ -84,12 +84,15 @@ class _MyHomePageState extends State<MyHomePage> {
       final url = '$apiUrl/?socketId=$socketId';
       var dio = Dio();
       FormData formData = FormData.fromMap({
-        "files":
-            MultipartFile.fromFileSync(files[0].path, filename: files[0].name),
+        "files": files
+            .map<MultipartFile>((file) =>
+                MultipartFile.fromFileSync(file.path, filename: file.name))
+            .toList(),
       });
       var response = await dio.post(url, data: formData);
       print(response);
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text('Files uploaded with success!')));
+      Scaffold.of(context).showSnackBar(
+          SnackBar(content: Text('Files uploaded with success!')));
     } catch (error) {
       print(error);
     }
