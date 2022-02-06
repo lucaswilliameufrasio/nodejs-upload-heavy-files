@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	Server *socketio.Server
+	Server        *socketio.Server
+	OnUploadEvent = "file-uploaded"
 )
 
 func StartSocketIOServer() {
@@ -15,6 +16,8 @@ func StartSocketIOServer() {
 
 	Server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
+		// s.Join(s.ID())
+		Server.JoinRoom(s.ID(), OnUploadEvent, s)
 		log.Println("connected:", s.ID())
 		return nil
 	})
@@ -32,6 +35,4 @@ func StartSocketIOServer() {
 			log.Fatalf("socketio listen error: %s\n", err)
 		}
 	}()
-
-	defer Server.Close()
 }
