@@ -11,6 +11,10 @@ var (
 	OnUploadEvent = "file-uploaded"
 )
 
+var (
+	SocketID *string
+)
+
 func StartSocketIOServer() {
 	Server = socketio.NewServer(nil)
 
