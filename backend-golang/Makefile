@@ -8,6 +8,11 @@ start:
 	$ sh -c './bin/upload-heavy-files'
 .PHONY: start
 
+## Start app and watch file changes
+dev:
+	$ air -c .air.toml
+.PHONY: dev
+
 ## Download all dependencies
 get-deps:
 	$ go get -d ./...
