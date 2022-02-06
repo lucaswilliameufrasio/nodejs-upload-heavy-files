@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       var response = await dio.post(url, data: formData);
       print(response);
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Files uploaded with success!')));
     } catch (error) {
       print(error);
