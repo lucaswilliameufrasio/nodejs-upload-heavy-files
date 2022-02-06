@@ -109,8 +109,8 @@ class _MyHomePageState extends State<MyHomePage> {
       socket.onError((data) {
         print('Socket error: $data');
       });
-      socket.onConnectError((_) {
-        print('Connection error');
+      socket.onConnectError((error) {
+        print('Connection error: $error');
       });
       socket.onConnectTimeout((_) {
         print('Connection timeout');
