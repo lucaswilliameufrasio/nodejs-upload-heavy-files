@@ -3,6 +3,7 @@ module lucaswilliameufrasio/upload-heavy-files
 go 1.16
 
 require (
+	cloud.google.com/go/storage v1.20.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

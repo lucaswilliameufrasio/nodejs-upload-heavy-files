@@ -22,7 +22,8 @@ func uploadFiles(c *gin.Context) {
 	form, _ := c.MultipartForm()
 	files := form.File["files[]"]
 
-	err := storage.SaveFilesOnLocalStorage(files)
+	// err := storage.SaveFilesOnLocalStorage(files)
+	err := storage.SaveFilesOnGoogleCloudStorage(files)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
