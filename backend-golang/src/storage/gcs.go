@@ -28,7 +28,7 @@ var gcsClient *GCSClient
 func init() {
 	client, err := storage.NewClient(context.Background())
 	if err != nil {
-		log.Fatalf("Failed to create google cloud storage client: %v", err)
+		log.Printf("Failed to create google cloud storage client: %v", err)
 	}
 
 	gcsClient = &GCSClient{
