@@ -4,6 +4,11 @@ go 1.16
 
 require (
 	cloud.google.com/go/storage v1.20.0
+	github.com/aws/aws-sdk-go-v2 v1.13.0 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.13.1 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.9.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.24.1 // indirect
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
