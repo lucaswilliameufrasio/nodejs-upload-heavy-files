@@ -1,4 +1,5 @@
 let bytesAmount = 0;
+let socketIoClientId = null;
 const API_URL = "http://localhost:3000";
 const ON_UPLOAD_EVENT = "file-uploaded";
 
@@ -35,6 +36,7 @@ const showSize = () => {
 
 const updateMessage = (message) => {
   const messageElement = document.getElementById("message");
+  messageElement.hidden = false
   messageElement.innerHTML = message;
 
   messageElement.classList.add("alert", "alert-success");
@@ -42,25 +44,50 @@ const updateMessage = (message) => {
 };
 
 const showMessage = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const serverMessage = urlParams.get("message");
-  if (!serverMessage) return;
-
-  updateMessage(serverMessage);
+  const successMessage = 'Files uploaded with success!';
+  updateMessage(successMessage);
 };
 
-const configureForm = (targetUrl) => {
+const resetForm = () => {
   const form = document.getElementById("form");
-  form.action = targetUrl;
+  form.reset()
+}
+
+const onSubmit = (event) => {
+  event.preventDefault();
+  const fileInputElement = document.getElementById("file");
+
+  const formData = new FormData()
+  for (let index = 0; index < fileInputElement.files.length; index++) {
+    formData.append('file', fileInputElement.files[index])
+  }
+
+  const uploadURL = socketIoClientId ? API_URL + `?socketId=${socketIoClientId}` : API_URL
+
+  fetch(uploadURL, {
+    method: 'POST',
+    body: formData
+  }).then((response) => {
+    console.log('Successfully uploaded', response)
+    showMessage()
+    resetForm()
+  }).catch((error) => {
+    console.error('Something went wrong', error)
+  })
+}
+
+const configureForm = () => {
+  const form = document.getElementById("form");
+  form.onsubmit = onSubmit
 };
+
 
 const onload = () => {
-  showMessage();
   const ioClient = io.connect(API_URL, { withCredentials: false });
   ioClient.on("connect", (message) => {
     console.log("connected!", ioClient.id);
-    const targetUrl = API_URL + `?socketId=${ioClient.id}`;
-    configureForm(targetUrl);
+    socketIoClientId = ioClient.id
+    configureForm();
   });
 
   ioClient.on(ON_UPLOAD_EVENT, (bytesReceived) => {
