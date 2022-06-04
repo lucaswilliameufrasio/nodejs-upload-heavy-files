@@ -66,7 +66,7 @@ class UploadHandler {
   async #pipeStreamsToLocalStorage(file, fileName) {
     await pipelineAsync(
       file,
-      this.#handleFileBytes.bind(this),
+      this.#handleFileBytes.call(this),
       localStorageService.createWritableStreamToLocal(fileName)
     );
   }
@@ -74,7 +74,7 @@ class UploadHandler {
   async #pipeStreamsToGoogleCloudStorage(file, fileName) {
     await pipelineAsync(
       file,
-      this.#handleFileBytes.apply(this, [fileName]),
+      this.#handleFileBytes.call(this),
       storageService.createWritableStreamToGCS(fileName)
     );
   }
