@@ -1,4 +1,5 @@
 const BusBoy = require("busboy");
+const url = require("url");
 const GoogleCloudStorageService = require("../services/googleCloudStorageService");
 const LocalStorageService = require("../services/localStorageService");
 const { logger, pipelineAsync } = require("../util");
@@ -12,9 +13,33 @@ const STORAGE_SERVICE = process.env.STORAGE_SERVICE || "local";
 class UploadHandler {
   #io;
   #socketId;
-  constructor(io, socketId) {
+  constructor(io) {
     this.#io = io;
-    this.#socketId = socketId;
+  }
+
+  async handle(request, response) {
+    const { headers } = request
+    const {
+      query: { socketId },
+    } = url.parse(request.url, true);
+    this.#socketId = socketId
+
+    const onFinish = (response) => () => {
+      response.writeHead(201, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "OPTIONS, POST",
+      })
+      response.end();
+    };
+
+    const busboyInstance = this.registerEvents(
+      headers,
+      onFinish(response)
+    );
+
+    await pipelineAsync(request, busboyInstance);
+
+    logger.info("Request finished with success!");
   }
 
   registerEvents(headers, onFinish) {
