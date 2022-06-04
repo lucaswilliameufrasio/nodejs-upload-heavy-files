@@ -26,10 +26,10 @@ class Routes {
     const uploadHandler = new UploadHandler(this.#io, socketId);
 
     const onFinish = (response, redirectTo) => () => {
-      response.writeHead(303, {
-        Connection: "close",
-        Location: `${redirectTo}?message=Files uploaded with success!`,
-      });
+      response.writeHead(201, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "OPTIONS, POST",
+      })
       response.end();
     };
 
