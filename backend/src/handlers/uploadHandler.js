@@ -1,7 +1,7 @@
 const BusBoy = require("busboy");
-const { logger, pipelineAsync } = require("./util");
-const GoogleCloudStorageService = require("./googleCloudStorageService");
-const LocalStorageService = require("./localStorageService");
+const GoogleCloudStorageService = require("../services/googleCloudStorageService");
+const LocalStorageService = require("../services/localStorageService");
+const { logger, pipelineAsync } = require("../util");
 
 const localStorageService = new LocalStorageService();
 const storageService = new GoogleCloudStorageService();

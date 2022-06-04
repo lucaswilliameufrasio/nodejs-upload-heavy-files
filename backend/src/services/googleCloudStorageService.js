@@ -1,7 +1,7 @@
 const { Storage } = require("@google-cloud/storage");
-const { logger } = require("./util");
-const { v4 } = require("uuid");
 const mime = require("mime-types");
+const { v4 } = require("uuid");
+const { logger } = require("../util");
 
 const storage = new Storage({
   projectId: process.env.GCS_PROJECT_ID,

@@ -8,6 +8,8 @@ const PORT = 3000;
 const handler = function (request, response) {
   const defaultRoute = async (request, response) => response.end("Hello");
 
+  console.log('request', request.url)
+
   const routes = new Routes(io);
   const chosen = routes[request.method.toLowerCase()] || defaultRoute;
 

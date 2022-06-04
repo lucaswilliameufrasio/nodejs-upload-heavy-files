@@ -1,5 +1,5 @@
 const url = require("url");
-const UploadHandler = require("./uploadHandler");
+const UploadHandler = require("./handlers/uploadHandler");
 const { pipelineAsync, logger } = require("./util");
 
 class Routes {
