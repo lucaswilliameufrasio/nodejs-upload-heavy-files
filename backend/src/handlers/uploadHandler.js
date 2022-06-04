@@ -52,7 +52,7 @@ class UploadHandler {
     return busboy;
   }
 
-  #handleFileBytes(fileName) {
+  #handleFileBytes() {
     async function* handleData(data) {
       for await (const item of data) {
         const size = item.length;
@@ -66,7 +66,7 @@ class UploadHandler {
   async #pipeStreamsToLocalStorage(file, fileName) {
     await pipelineAsync(
       file,
-      this.#handleFileBytes.apply(this, [fileName]),
+      this.#handleFileBytes.bind(this),
       localStorageService.createWritableStreamToLocal(fileName)
     );
   }
