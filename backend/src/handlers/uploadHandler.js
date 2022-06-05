@@ -1,5 +1,5 @@
 const { default: PQueue } = require('p-queue')
-const { Writable } = require('stream')
+const { Writable, PassThrough } = require('stream')
 const BusBoy = require('busboy')
 const { v4 } = require('uuid')
 const url = require('url')
@@ -126,20 +126,24 @@ class UploadHandler {
     )
   }
 
-  // TODO: Fix #handleFileBytes. It is never being called because the file
-  // was already piped to s3storageService.uploadFile
   async #pipeStreamsToAWSS3Storage(file, fileName) {
-    const waitFileUpload = s3storageService.uploadFile(file, fileName)
+    const progressStream = new PassThrough()
+    const uploadStream = new PassThrough()
+    const writableStream = new Writable({
+      write(chunk, encoding, done) {
+        done()
+      }
+    })
+    file.pipe(progressStream)
+    file.pipe(uploadStream)
+    const pipelinePromise = pipelineAsync(
+      progressStream,
+      this.#handleFileBytes.call(this),
+      writableStream,
+    )
+    const waitFileUpload = s3storageService.uploadFile(uploadStream, fileName)
     await Promise.all([
-      pipelineAsync(
-        file,
-        this.#handleFileBytes.call(this),
-        new Writable({
-          write(chunk, encoding, done) {
-            done()
-          }
-        }),
-      ),
+      pipelinePromise,
       waitFileUpload,
     ])
   }
