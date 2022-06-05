@@ -8,7 +8,7 @@ module.exports = class LocalStorageService {
     const saveFileTo = join(
       process.cwd(),
       "downloads",
-      `${v4()}-${fileName}`
+      fileName
     );
     logger.info("Uploading: " + saveFileTo);
     return createWriteStream(saveFileTo);

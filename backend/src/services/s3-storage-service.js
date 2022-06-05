@@ -16,13 +16,12 @@ const s3Client = new S3({
 module.exports = class AWSS3StorageService {
   async uploadFile(readStream, fileName) {
     const contentType = mime.lookup(fileName)
-    const uniqueFileName = `${v4()}-${fileName}`
 
     const upload = new Upload({
       client: s3Client,
       params: {
         Bucket: bucketName,
-        Key: uniqueFileName,
+        Key: fileName,
         Body: readStream,
         ContentType: contentType,
       },

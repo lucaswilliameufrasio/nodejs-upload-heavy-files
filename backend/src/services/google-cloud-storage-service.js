@@ -1,6 +1,5 @@
 const { Storage } = require("@google-cloud/storage");
 const mime = require("mime-types");
-const { v4 } = require("uuid");
 const { logger } = require("../util");
 
 const storage = new Storage({
@@ -15,7 +14,7 @@ module.exports = class GoogleCloudStorageService {
   createWritableStreamToGCS(fileName) {
     logger.info('uploading to Google Cloud Storage')
     const contentType = mime.lookup(fileName);
-    const destination = `${destinationFolderName}/${v4()}-${fileName}`;
+    const destination = `${destinationFolderName}/${fileName}`;
 
     const bucket = storage.bucket(bucketName);
     return bucket.file(destination).createWriteStream({

@@ -1,6 +1,8 @@
 const { Writable } = require('stream')
 const BusBoy = require('busboy')
+const { v4 } = require('uuid')
 const url = require('url')
+const { default: PQueue } = require('p-queue')
 const LocalStorageService = require('../services/local-storage-service')
 const GoogleCloudStorageService = require('../services/google-cloud-storage-service')
 const S3CloudStorageService = require('../services/s3-storage-service')
@@ -21,35 +23,80 @@ class UploadHandler {
   }
 
   async handle(request, response) {
+    const queue = new PQueue({ concurrency: 1 })
     const { headers } = request
     const {
       query: { socketId },
     } = url.parse(request.url, true)
     this.#socketId = socketId
 
-    const onFinish = (response) => () => {
-      response.writeHead(201, {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'OPTIONS, POST',
-      })
-      response.end()
-    }
+    const abort = this.#abortOnError(queue, request, response)
+    const busboyInstance = this.registerEvents(
+      headers,
+      this.#handleError(queue, request, response),
+      abort,
+    )
 
-    const busboyInstance = this.registerEvents(headers, onFinish(response))
+    // TODO: find a way to access the list of files uploaded
+    // to delete all them when required to do an atomic operation
+    request.on('abort', () => abort(busboyInstance))
 
     await pipelineAsync(request, busboyInstance)
 
+    await queue.onIdle()
+
     logger.info('Request finished with success!')
+    response.writeHead(201, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'OPTIONS, POST',
+    })
+    response.end()
   }
 
-  registerEvents(headers, onFinish) {
-    const busboy = BusBoy({ headers });
+  registerEvents(headers, handleError, abortOnError) {
+    const busboy = BusBoy({ headers })
 
-    busboy.on('file', this.#onFile.bind(this))
+    busboy.on('file', (name, file, info) => {
+      handleError(busboy, async () => {
+        return this.#onFile(name, file, info)
+      })
+    })
 
-    busboy.on('finish', onFinish)
+    busboy.on('error', () => {
+      abortOnError(busboy)
+    })
 
     return busboy
+  }
+
+  #abortOnError(queue, request, response) {
+    return (busboy, filesUploaded = []) => {
+      request.unpipe(busboy)
+      queue.pause()
+
+      logger.info('filesUploaded', filesUploaded)
+      if (!request.aborted) {
+        response.set('Connection', 'close')
+        response.sendStatus(413)
+      }
+    }
+  }
+
+  #handleError(queue, request, response) {
+    const filesUploaded = []
+    const abort = this.#abortOnError(queue, request, response)
+    return (busboy, fn) => {
+      queue.add(async () => {
+        try {
+          const fileName = await fn()
+          filesUploaded.push(fileName)
+          logger.info('filesUploaded', filesUploaded)
+          return fileName
+        } catch (error) {
+          abort(busboy, filesUploaded)
+        }
+      })
+    }
   }
 
   #handleFileBytes() {
@@ -109,10 +156,13 @@ class UploadHandler {
   }
 
   async #onFile(name, file, info) {
-    const { filename } = info;
-    await this.#pipeStreamToStorage(file, filename)
+    const { filename } = info
+    const fileName = `${v4()}-${filename}`
+    await this.#pipeStreamToStorage(file, fileName)
 
-    logger.info(`File [${filename}] finished!`)
+    logger.info(`File [${fileName}] finished!`)
+
+    return fileName
   }
 }
 
