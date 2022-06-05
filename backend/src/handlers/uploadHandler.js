@@ -1,10 +1,10 @@
+const { default: PQueue } = require('p-queue')
 const { Writable } = require('stream')
 const BusBoy = require('busboy')
 const { v4 } = require('uuid')
 const url = require('url')
-const { default: PQueue } = require('p-queue')
-const LocalStorageService = require('../services/local-storage-service')
 const GoogleCloudStorageService = require('../services/google-cloud-storage-service')
+const LocalStorageService = require('../services/local-storage-service')
 const S3CloudStorageService = require('../services/s3-storage-service')
 const { logger, pipelineAsync } = require('../util')
 
