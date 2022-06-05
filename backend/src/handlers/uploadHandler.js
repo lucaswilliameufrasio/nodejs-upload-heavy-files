@@ -43,7 +43,7 @@ class UploadHandler {
   }
 
   registerEvents(headers, onFinish) {
-    const busboy = new BusBoy({ headers })
+    const busboy = BusBoy({ headers });
 
     busboy.on('file', this.#onFile.bind(this))
 
@@ -108,10 +108,11 @@ class UploadHandler {
     await storageService[STORAGE_SERVICE].apply(this, [file, fileName])
   }
 
-  async #onFile(fieldName, file, fileName) {
-    await this.#pipeStreamToStorage(file, fileName)
+  async #onFile(name, file, info) {
+    const { filename } = info;
+    await this.#pipeStreamToStorage(file, filename)
 
-    logger.info(`File [${fileName}] finished!`)
+    logger.info(`File [${filename}] finished!`)
   }
 }
 
