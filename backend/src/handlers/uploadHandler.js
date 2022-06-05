@@ -135,10 +135,7 @@ class UploadHandler {
         new Writable({
           write(chunk, encoding, done) {
             done()
-          },
-          final(done) {
-            done()
-          },
+          }
         }),
       ),
       waitFileUpload,
