@@ -126,6 +126,8 @@ class UploadHandler {
     )
   }
 
+  // TODO: Fix #handleFileBytes. It is never being called because the file
+  // was already piped to s3storageService.uploadFile
   async #pipeStreamsToAWSS3Storage(file, fileName) {
     const waitFileUpload = s3storageService.uploadFile(file, fileName)
     await Promise.all([
